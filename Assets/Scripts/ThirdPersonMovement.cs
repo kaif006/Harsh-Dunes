@@ -15,16 +15,24 @@ public class ThirdPersonMovement : MonoBehaviour
     public Transform groundCheck;
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
-    public LayerMask playerMask;
 
     Vector3 fallVelocity;
 
     float turnSmoothVelocity;
 
+    public Animator animator;
+
+
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
 
     void Update()
     {
-        bool isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask & ~playerMask);
+
+        bool isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded)
         {
@@ -48,7 +56,16 @@ public class ThirdPersonMovement : MonoBehaviour
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
-        Vector3 moveVelocity = Vector3.zero;
+        if(horizontal != 0 || vertical != 0)
+        {
+            animator.SetBool("isRunning", true);
+        }
+        else
+        {
+            animator.SetBool("isRunning", false);
+        }
+
+            Vector3 moveVelocity = Vector3.zero;
 
         if (direction.magnitude >= 0.1f)
         {
@@ -58,6 +75,7 @@ public class ThirdPersonMovement : MonoBehaviour
 
             Vector3 moveDir = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
             moveVelocity = moveDir.normalized * speed;
+
         }
 
         moveVelocity.y = fallVelocity.y;
